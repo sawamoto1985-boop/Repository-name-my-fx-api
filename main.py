@@ -1,31 +1,38 @@
 from flask import Flask, jsonify
 import requests
-from datetime import datetime, timedelta
+import xml.etree.ElementTree as ET
 
 app = Flask(__name__)
 
-FINNHUB_API_KEY = "d5to79pr01qtjet0lh90d5to79pr01qtjet0lh9g"
+@app.route('/')
+def home():
+    return "Japan Economic News API is Running!"
 
 @app.route('/calendar')
 def get_calendar():
     try:
-        # 今日の日付から、前後1週間の範囲を設定
-        today = datetime.now()
-        start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
-        end_date = (today + timedelta(days=7)).strftime('%Y-%m-%d')
-
-        # 日付範囲を指定してリクエスト
-        url = f"https://finnhub.io/api/v1/calendar/economic?from={start_date}&to={end_date}&token={FINNHUB_API_KEY}"
-        response = requests.get(url)
-        data = response.json()
+        # Yahoo!ニュース（経済総合）のRSSを取得
+        rss_url = "https://news.yahoo.co.jp/rss/categories/business.xml"
+        response = requests.get(rss_url)
+        response.encoding = 'utf-8'
         
-        events = data.get('economicCalendar', [])
+        # XMLを解析
+        root = ET.fromstring(response.text)
+        news_list = []
         
-        # もしそれでも空なら、テスト用のメッセージを返す
-        if not events:
-            return jsonify([{"event": "No events found for this week", "country": "N/A"}])
+        for item in root.findall('.//item'):
+            title = item.find('title').text
+            link = item.find('link').text
+            pub_date = item.find('pubDate').text
             
-        return jsonify(events)
+            news_list.append({
+                "title": title,
+                "url": link,
+                "date": pub_date
+            })
+            
+        # 最新の10件を返す
+        return jsonify(news_list[:10])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

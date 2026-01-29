@@ -1,4 +1,4 @@
 flask
-investpy
-pandas
+requests
 gunicorn
+

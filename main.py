@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 # さっき取得したAPIキーをここに入れる
-FINNHUB_API_KEY = "d5to79pr01qtjet0lh90d5to79pr01qtjet0lh9g
+FINNHUB_API_KEY = "d5to79pr01qtjet0lh90d5to79pr01qtjet0lh9g"
 @app.route('/calendar')
 def get_calendar():
     try:

@@ -32,7 +32,7 @@ def get_calendar():
             })
             
         # 最新の10件を返す
-        return jsonify(news_list[:10])
+        return jsonify(news_list[:20])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
